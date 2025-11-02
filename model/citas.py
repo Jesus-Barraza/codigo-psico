@@ -1,9 +1,7 @@
 class Citas():
-    def __init__ (self, id):
-        self._id=id
-
-    def agregarcita(self):
-        pass
+    def __init__ (self, alumno, fecha, psicologo, diagnostico, notas, num_cita, status):
+        self.alumno=alumno
+        #Acá habrá un comando para agragar cita
 
     def mostrarcita(self):
         pass
@@ -18,8 +16,5 @@ class Citas():
         pass
 
     def cambiarstatus(self):
-        pass
-
-    def avisartutor(self):
         pass
 
