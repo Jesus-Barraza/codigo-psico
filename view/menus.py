@@ -1,6 +1,10 @@
 import flet as ft
 from threading import Timer
 import re
+from controller import funciones
+from tkinter import messagebox
+from view import borrador
+import tkinter as tk
 
 #Clase para el menú principal
 class Menu():
@@ -24,42 +28,62 @@ class Menu():
             "Jaques_Francois": "fonts/jaques_francois/JacquesFrancois-Regular.ttf"
         }
 
-
-    def validar_registro(self):
-        nombre = self.nombre.value.strip()
-        correo = self.correo.value.strip()
-        telefono = self.telefono.value.strip()
-        contra = self.contrasena.value.strip()
-        confirmar = self.confirmar.value.strip()
+    @staticmethod
+    def validar_registro(name, mail, phone, pasw, conf, error):
+        nombre = name.value.strip()
+        correo = mail.value.strip()
+        telefono = phone.value.strip()
+        contra = pasw.value.strip()
+        confirmar = conf.value.strip()
 
         # 1. Campos vacíos
         if not nombre or not correo or not telefono or not contra or not confirmar:
-            self.lbl_error.value = "Todos los campos son obligatorios."
+            error.value = "Todos los campos son obligatorios."
             return False
 
         # 2. Validar correo
         regex_correo = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(regex_correo, correo):
-            self.lbl_error.value = "El correo electrónico no es válido."
+            error.value = "El correo electrónico no es válido."
             return False
 
         # 3. Validar teléfono
         if not telefono.isdigit() or len(telefono) < 8:
-            self.lbl_error.value = "El número telefónico debe contener solo números y mínimo 8 dígitos."
+            error.value = "El número telefónico debe contener solo números y mínimo 8 dígitos."
             return False
 
         # 4. Validar contraseña mínima
         if len(contra) < 8:
-            self.lbl_error.value = "La contraseña debe tener al menos 8 caracteres."
+            error.value = "La contraseña debe tener al menos 8 caracteres."
             return False
 
         # 5. Contraseñas iguales
         if contra != confirmar:
-            self.lbl_error.value = "Las contraseñas no coinciden."
+            error.value = "Las contraseñas no coinciden."
             return False
 
         # Si todo está bien
-        self.lbl_error.value = ""
+        error.value = ""
+        return True
+
+    @staticmethod
+    def validar_sesion(mail, pasw, error):
+        correo = mail.value.strip()
+        contra = pasw.value.strip()
+
+        # 1. Campos vacíos
+        if not correo or not contra:
+            error.value = "Todos los campos son obligatorios."
+            return False
+
+        # 2. Validar correo
+        regex_correo = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(regex_correo, correo):
+            error.value = "El correo electrónico no es válido."
+            return False
+
+        # Si todo está bien
+        error.value = ""
         return True
 
 
@@ -208,13 +232,13 @@ class Menu():
         # FUNCIONES DE VISUALIZAR/Ocultar contraseña
         # ------------------------------
         def toggle_password(e):
-            self.contrasena.password = not self.contrasena.password
-            password_icon.icon = ft.Icons.VISIBILITY if self.contrasena.password else ft.Icons.VISIBILITY_OFF
+            pass_label.password = not pass_label.password
+            password_icon.icon = ft.Icons.VISIBILITY if pass_label.password else ft.Icons.VISIBILITY_OFF
             ventana.update()
 
         def toggle_password2(e):
-            self.confirmar.password = not self.confirmar.password
-            password2_icon.icon = ft.Icons.VISIBILITY if self.confirmar.password else ft.Icons.VISIBILITY_OFF
+            conf_label.password = not conf_label.password
+            password2_icon.icon = ft.Icons.VISIBILITY if conf_label.password else ft.Icons.VISIBILITY_OFF
             ventana.update()
 
         # ------------------------------
@@ -228,13 +252,13 @@ class Menu():
             content_padding=ft.padding.symmetric(horizontal=15, vertical=10)
         )
 
-        self.nombre = ft.TextField(label="", hint_text="", **input_style)
+        name_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.correo = ft.TextField(label="", hint_text="", **input_style)
+        mail_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.telefono = ft.TextField(label="", hint_text="", **input_style)
+        phone_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.contrasena = ft.TextField(
+        pass_label = ft.TextField(
             label="", 
             hint_text="", 
             password=True, 
@@ -242,7 +266,7 @@ class Menu():
             **input_style
         )
 
-        self.confirmar = ft.TextField(
+        conf_label = ft.TextField(
             label="", 
             hint_text="", 
             password=True, 
@@ -250,20 +274,26 @@ class Menu():
             **input_style
         )
 
-        self.lbl_error = ft.Text(
+        lbl_error = ft.Text(
             value="",
             color="red",
             size=14,
             weight=ft.FontWeight.BOLD
         )
 
-        def registrar_click(self, e):
-            if self.validar_registro():
-                print("Registro válido, continuar...")
-                # Aquí haces INSERT a BD o cambias de pantalla
+        def registrar_click(e):
+            if self.validar_sesion(mail_label, pass_label, lbl_error):
+                sesion=funciones.Usuarios.inicio_sesion(mail_label.value.strip(), pass_label.value.strip())
+                if sesion:
+                    ventana.window.destroy()
+                    window=tk.Tk()
+                    borrador.Menu(window, sesion)
+                    window.mainloop()
+                else:
+                    lbl_error.value="Correo o contraseña incorrectos."
+                    ventana.update()
             else:
-                self.page.update()
-
+                ventana.update()
 
         # Botones de mostrar/ocultar
         password_icon = ft.IconButton(
@@ -301,21 +331,22 @@ class Menu():
 
                 # ----------- CORREO ----------
                 labeled(ft.Icons.EMAIL, "Correo electrónico:"),
-                self.correo,
+                mail_label,
 
                 # ----------- CONTRASEÑA ----------
                 labeled(ft.Icons.KEY, "Contraseña:"),
-                ft.Row([self.contrasena, password_icon], alignment="center"),
+                ft.Row([pass_label, password_icon], alignment="center"),
 
                 ft.Container(height=20),
 
                 # BOTÓN REGISTRAR
                 ft.ElevatedButton(
-                    text="Registrar",
+                    text="Iniciar sesión",
                     width=200,
                     height=50,
                     color="black",
                     bgcolor="#EDEDED",
+                    on_click=registrar_click,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=10),
                         side=ft.BorderSide(2, "black"),
@@ -405,13 +436,13 @@ class Menu():
         # FUNCIONES DE VISUALIZAR/Ocultar contraseña
         # ------------------------------
         def toggle_password(e):
-            self.contrasena.password = not self.contrasena.password
-            password_icon.icon = ft.Icons.VISIBILITY if self.contrasena.password else ft.Icons.VISIBILITY_OFF
+            pass_label.password = not pass_label.password
+            password_icon.icon = ft.Icons.VISIBILITY if pass_label.password else ft.Icons.VISIBILITY_OFF
             ventana.update()
 
         def toggle_password2(e):
-            self.confirmar.password = not self.confirmar.password
-            password2_icon.icon = ft.Icons.VISIBILITY if self.confirmar.password else ft.Icons.VISIBILITY_OFF
+            conf_label.password = not conf_label.password
+            password2_icon.icon = ft.Icons.VISIBILITY if conf_label.password else ft.Icons.VISIBILITY_OFF
             ventana.update()
 
         # ------------------------------
@@ -425,13 +456,13 @@ class Menu():
             content_padding=ft.padding.symmetric(horizontal=15, vertical=10)
         )
 
-        self.nombre = ft.TextField(label="", hint_text="", **input_style)
+        name_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.correo = ft.TextField(label="", hint_text="", **input_style)
+        mail_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.telefono = ft.TextField(label="", hint_text="", **input_style)
+        phone_label = ft.TextField(label="", hint_text="", **input_style)
 
-        self.contrasena = ft.TextField(
+        pass_label = ft.TextField(
             label="", 
             hint_text="", 
             password=True, 
@@ -439,7 +470,7 @@ class Menu():
             **input_style
         )
 
-        self.confirmar = ft.TextField(
+        conf_label = ft.TextField(
             label="", 
             hint_text="", 
             password=True, 
@@ -447,19 +478,21 @@ class Menu():
             **input_style
         )
 
-        self.lbl_error = ft.Text(
+        lbl_error = ft.Text(
             value="",
             color="red",
             size=14,
             weight=ft.FontWeight.BOLD
         )
 
-        def registrar_click(self, e):
-            if self.validar_registro():
+        def registrar_click(e):
+            if self.validar_registro(name_label, mail_label, phone_label, pass_label, conf_label, lbl_error):
                 print("Registro válido, continuar...")
-                # Aquí haces INSERT a BD o cambias de pantalla
+                regi=funciones.Usuarios.registrar(name_label.value.strip(), mail_label.value.strip(), phone_label.value.strip(), pass_label.value.strip())
+                if regi:
+                    self.menuInicio(ventana)
             else:
-                self.page.update()
+                ventana.update()
 
         # Botones de mostrar/ocultar
         password_icon = ft.IconButton(
@@ -497,19 +530,19 @@ class Menu():
 
                 # ----------- NOMBRE ----------
                 labeled(ft.Icons.ACCOUNT_CIRCLE, "Nombre:"),
-                self.nombre,
+                name_label,
 
                 # ----------- CORREO ----------
                 labeled(ft.Icons.EMAIL, "Correo electrónico:"),
-                self.correo,
+                mail_label,
 
                 # ----------- TELÉFONO ----------
                 labeled(ft.Icons.PHONE, "Número telefónico:"),
-                self.telefono,
+                phone_label,
 
                 # ----------- CONTRASEÑA ----------
                 labeled(ft.Icons.KEY, "Contraseña:"),
-                ft.Row([self.contrasena, password_icon], alignment="center"),
+                ft.Row([pass_label, password_icon], alignment="center"),
 
                 # ----------- CONFIRMAR CONTRA ----------
                 ft.Text(
@@ -518,7 +551,9 @@ class Menu():
                     weight="bold",
                     font_family="Jaques_Francois",
                 ),
-                ft.Row([self.confirmar, password2_icon], alignment="center"),
+                ft.Row([conf_label, password2_icon], alignment="center"),
+
+                lbl_error,
 
                 ft.Container(height=20),
 
@@ -609,12 +644,12 @@ class Menu():
         )
 
         ft.Column([
-            self.nombre,
-            self.correo,
-            self.telefono,
-            self.contrasena,
-            self.confirmar,
-            self.lbl_error,     # ← aquí aparece el error
+            name_label,
+            mail_label,
+            phone_label,
+            pass_label,
+            conf_label,
+            lbl_error,     # ← aquí aparece el error
             ft.ElevatedButton("Registrar", on_click=registrar_click)
         ])
 
