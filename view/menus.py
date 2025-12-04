@@ -42,7 +42,8 @@ class Menu():
     def menuInicio(self, ventana):
         ventana.controls.clear()
         self.fontFamily(ventana)
-        # Some Flet versions don't include Positioned; use Rows/Columns instead
+        
+        # Top decoration
         top_row = ft.Row(
             [
                 ft.Container(expand=True),
@@ -106,7 +107,7 @@ class Menu():
                             height=60,
                             bgcolor="#D9D9D9",
                             color="#000000",
-                            on_click=lambda e: self.menuRegistrarse(ventana),
+                            on_click=lambda e:self.menuRegistrarse(ventana),
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=12),
                                 side=ft.BorderSide(1, "#000000"),
@@ -145,11 +146,12 @@ class Menu():
         )
 
         container = ft.Container(
-            content=ft.Column([top_row, main_column, bottom_row], expand=True),
+            content=main_content,
             width=1920,
             height=1080,
             bgcolor="#BCDFE6",
         )
+        
         ventana.add(container)
         ventana.update()
     
@@ -160,6 +162,8 @@ class Menu():
     def menuRegistrarse(self, ventana):
         ventana.controls.clear()
         self.fontFamily(ventana)
+
+        # Top decoration
         top_row = ft.Row(
             [
                 ft.Container(expand=True),
