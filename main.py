@@ -3,6 +3,7 @@ Este es el archivo de main. En este archivo se ingresará directamente al direct
 '''
 import flet as ft
 from view import menus
+from model.conexionBD import start
 
 #Clase para iniciar la aplicación
 class app():
@@ -11,6 +12,5 @@ class app():
 
 #Punto de entrada principal
 if __name__ == "__main__":
-    ft.app(target=app, assets_dir="img")
-    
-
+    if start:
+        ft.app(target=app, assets_dir="img", view=ft.AppView.FLET_APP)
