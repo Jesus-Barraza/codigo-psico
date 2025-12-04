@@ -32,3 +32,28 @@ class Sesion():
                 return None      
         except:
             return None         
+        
+class Citas():
+    @staticmethod
+    def obtener_citas_dia(psicologo_id):
+        try:
+            cursor.execute(
+                "select ID_app, students.name_stu, date, status from appointments JOIN students ON FK_stu=students.control_num where FK_psy=%s and date >= CURDATE() order by date",
+                (psicologo_id,)
+            )
+            citas=cursor.fetchall()
+            return citas
+        except:
+            return []
+        
+    @staticmethod
+    def obtener_citas_h(psicologo_id):
+        try:
+            cursor.execute(
+                "select ID_app, students.name_stu, date, status from appointments JOIN students ON FK_stu=students.control_num where FK_psy=%s and date < CURDATE() order by date",
+                (psicologo_id,)
+            )
+            citas=cursor.fetchall()
+            return citas
+        except:
+            return []

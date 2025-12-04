@@ -27,3 +27,13 @@ class Usuarios():
         else:
             noti=messagebox.showerror(title="Registro", message="No se ha podido registrar al usuario, inténtelo más tarde")
             return None
+
+class Citas():
+    @staticmethod
+    def obtener_citas_dia(psicologo_id):
+        citas=sesion.Citas.obtener_citas_dia(psicologo_id)
+        return citas
+    
+    def obtener_citas_h(psicologo_id):
+        citas=sesion.Citas.obtener_citas_h(psicologo_id)
+        return citas

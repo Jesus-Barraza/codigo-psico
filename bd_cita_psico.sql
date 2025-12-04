@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `appointments` (
   `ID_app` int(11) NOT NULL,
-  `FK_stu` int(11) NOT NULL,
+  `FK_stu` varchar(15) NOT NULL,
   `FK_psy` int(11) NOT NULL,
   `date` datetime DEFAULT NULL,
   `status` varchar(10) DEFAULT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE `psychologists` (
 --
 
 CREATE TABLE `students` (
-  `control_num` int(11) NOT NULL,
+  `control_num` varchar(15) NOT NULL,
   `FK_group` int(11) NOT NULL,
   `name_stu` varchar(100) DEFAULT NULL,
   `mail_stu` varchar(50) DEFAULT NULL,
@@ -160,7 +160,7 @@ ALTER TABLE `psychologists`
 -- AUTO_INCREMENT de la tabla `students`
 --
 ALTER TABLE `students`
-  MODIFY `control_num` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `control_num` varchar(15) NOT NULL;
 
 --
 -- AUTO_INCREMENT de la tabla `tutored`

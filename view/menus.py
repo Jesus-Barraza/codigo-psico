@@ -15,10 +15,11 @@ class Menu():
         ventana.vertical_alignment = "center"
         ventana.horizontal_alignment = "center" #Alineación centrada
         ventana.resizable = False #No redimensionable
-        ventana.window_width = 1920
+        ventana.window_width = 1920 #Tamaño de ventana
         ventana.window_height = 1080 #Tamaño de ventana
         ventana.bgcolor = "#BCDFE6" #Color de fondo
         ventana.update() #Actualizar ventana
+        ventana.scroll = "adaptive" #Habilitar scroll adaptativo
         self.pantallaCarga(ventana) 
 
     #Fuentes de texto como función
@@ -172,6 +173,23 @@ class Menu():
                             bgcolor="#D9D9D9",
                             color="#000000",
                             on_click=lambda e:self.menuRegistrarse(ventana),
+                            style=ft.ButtonStyle(
+                                shape=ft.RoundedRectangleBorder(radius=12),
+                                side=ft.BorderSide(1, "#000000"),
+                                text_style=ft.TextStyle(
+                                    weight="w400",
+                                    font_family="Jaques_Francois",
+                                    size=20,
+                                ),
+                            ),
+                        ),
+                        ft.ElevatedButton(
+                            text="Salir",
+                            width=180,
+                            height=50,
+                            bgcolor="#D9D9D9",
+                            color="#000000",
+                            on_click=lambda e:ventana.window.destroy(),
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=12),
                                 side=ft.BorderSide(1, "#000000"),
@@ -377,18 +395,6 @@ class Menu():
             horizontal_alignment="center",
             alignment="center"
         )
-        # Bottom decoration
-        bottom_decoration = ft.Container(
-            content=ft.Image(
-                src="esquina1.svg",
-                width=500,
-                height=700,
-                fit=ft.ImageFit.CONTAIN,
-            ),
-            margin=ft.margin.only(left=-200, bottom=-300),
-            alignment=ft.alignment.bottom_left,
-            disabled=True,
-        )
 
         # Top decoration
         top_row = ft.Row(
@@ -406,6 +412,19 @@ class Menu():
                 ),
             ],
             vertical_alignment=ft.CrossAxisAlignment.START,
+        )
+
+        # Bottom decoration
+        bottom_decoration = ft.Container(
+            content=ft.Image(
+                src="esquina1.svg",
+                width=500,
+                height=700,
+                fit=ft.ImageFit.CONTAIN,
+            ),
+            margin=ft.margin.only(left=-200, bottom=-300),
+            alignment=ft.alignment.bottom_left,
+            disabled=True,
         )
 
         main_content = ft.Stack(
@@ -595,19 +614,6 @@ class Menu():
             horizontal_alignment="center",
             alignment="center"
         )
-        
-        # Bottom decoration
-        bottom_decoration = ft.Container(
-            content=ft.Image(
-                src="esquina1.svg",
-                width=500,
-                height=700,
-                fit=ft.ImageFit.CONTAIN,
-            ),
-            margin=ft.margin.only(left=-200, bottom=-300),
-            alignment=ft.alignment.bottom_left,
-            disabled=True,
-        )
 
         # Top decoration
         top_row = ft.Row(
@@ -625,6 +631,19 @@ class Menu():
                 ),
             ],
             vertical_alignment=ft.CrossAxisAlignment.START,
+        )
+
+        # Bottom decoration
+        bottom_decoration = ft.Container(
+            content=ft.Image(
+                src="esquina1.svg",
+                width=500,
+                height=700,
+                fit=ft.ImageFit.CONTAIN,
+            ),
+            margin=ft.margin.only(left=-200, bottom=-300),
+            alignment=ft.alignment.bottom_left,
+            disabled=True,
         )
 
         main_content = ft.Stack(
