@@ -120,6 +120,16 @@ class Citas():
         res=sesion.Citas.ActualizarCita(id_stu, date, id_psi, id_date)
         Citas.respuestaSql(res)
         return res
+
+    @staticmethod
+    def eliminarCita(id_date, id_psi):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Seguro que desea borrar el registro de esta cita?", icon="warning")
+        if noti:
+            res=sesion.Citas.EliminarCita(id_date, id_psi)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
     
 class Estudiantes():
     @staticmethod
