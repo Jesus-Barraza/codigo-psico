@@ -301,8 +301,10 @@ class Menu():
 
         def registrar_click(e):
             if self.validar_sesion(mail_label, pass_label, lbl_error):
-                sesion=funciones.Usuarios.inicio_sesion(mail_label.value.strip(), pass_label.value.strip())
+                sesion=funciones.Usuarios.inicioSesion(mail_label.value.strip(), pass_label.value.strip(), ventana)
                 if sesion:
+                    start=Timer(1.0, lambda:None)
+                    start.start()
                     ventana.window.destroy()
                     window=tk.Tk()
                     borrador.Menu(window, sesion)
@@ -506,8 +508,7 @@ class Menu():
 
         def registrar_click(e):
             if self.validar_registro(name_label, mail_label, phone_label, pass_label, conf_label, lbl_error):
-                print("Registro válido, continuar...")
-                regi=funciones.Usuarios.registrar(name_label.value.strip(), mail_label.value.strip(), phone_label.value.strip(), pass_label.value.strip())
+                regi=funciones.Usuarios.registrar(name_label.value.strip(), mail_label.value.strip(), phone_label.value.strip(), pass_label.value.strip(), ventana)
                 if regi:
                     self.menuInicio(ventana)
             else:
