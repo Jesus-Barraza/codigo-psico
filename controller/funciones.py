@@ -95,7 +95,7 @@ class Citas():
     def buscarCitas(psicologo_id, var):
         citas=sesion.Citas.buscarCitas(psicologo_id, var)
         return citas
-
+    
 class Estudiantes():
     @staticmethod
     def buscarEstudiantes(var):
