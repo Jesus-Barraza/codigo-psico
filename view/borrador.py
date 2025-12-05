@@ -34,6 +34,29 @@ class Menu():
         for widget in ventana.winfo_children():
             widget.destroy()
 
+    @staticmethod
+    def limit_float(p):
+        allowed = "0123456789."
+        if all(ch in allowed for ch in p) and p.count(".") <= 1:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def limit_int(p):
+        if p.isdigit():
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def limit_mail(p):
+        allowed = "0123456789.abcdefghijklmnopqrstuvwxyz@_"
+        if all(ch in allowed for ch in p) and p.count("@") <= 1:
+            return True
+        else:
+            return False
+
     def cambiarTema(self, ventana, sesion, oscuro_var):
         self.tema_oscuro = oscuro_var.get()  # <-- Actualiza valor persistente
         self.modoOscuro(ventana, sesion, self.tema_oscuro)
@@ -145,7 +168,7 @@ class Menu():
                 elif num==3:
                     button_1.config(command=lambda:self.menuCitas(ventana, sesion))
                 elif num==4:
-                    button_1.config(command=lambda:self.menuEstudiatnes(ventana, sesion))
+                    button_1.config(command=lambda:self.menuEstudiantes(ventana, sesion))
                 elif num==5:
                     button_1.config(command=lambda:self.menuTutores(ventana, sesion))
 
@@ -167,7 +190,7 @@ class Menu():
         menuarch.add_command(label="Calendario", command=lambda:self.menuCalendario(ventana, sesion))
         menuarch.add_command(label="Citas", command=lambda:self.menuCitas(ventana, sesion))
         menuarch.add_separator()
-        menuarch.add_command(label="Alumnos", command=lambda:self.menuEstudiatnes(ventana, sesion))
+        menuarch.add_command(label="Alumnos", command=lambda:self.menuEstudiantes(ventana, sesion))
         menuarch.add_command(label="Tutores", command=lambda:self.menuTutores(ventana, sesion))
         menuarch.add_separator()
         menuarch.add_command(label="Cerrar sesión", command=lambda:cerrarSesion(ventana))
@@ -442,7 +465,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.insertar(ventana, sesion, 1),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
 
@@ -468,7 +491,7 @@ class Menu():
         )
         btn_eliminar.grid(row=0, column=2, padx=20)
 
-    def menuEstudiatnes(self, ventana, sesion):
+    def menuEstudiantes(self, ventana, sesion):
         self.borrarPantalla(ventana)
 
         #variables
@@ -572,7 +595,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.insertar(ventana, sesion, 2),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
 
@@ -685,7 +708,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.insertar(ventana, sesion, 3),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
 
@@ -718,6 +741,335 @@ class Menu():
 
         lbl_upd=tk.Label(ventana, text="V0.3")
         lbl_upd.pack(pady=15)
+
+    def insertar(self, ventana, sesion, ori):
+        self.borrarPantalla(ventana)
+
+        #limitantes
+        verificacion_entero=(ventana.register(self.limit_int), "%P")
+        verificacion_mail=(ventana.register(self.limit_mail), "%P")
+
+        if ori==1:
+            tl=self.grupoTitulo(ventana, sesion, "Insertar citas", False, 0)
+
+            #variables
+            estud=tk.StringVar()
+            calendar=tk.StringVar()
+            
+            #funciones
+            def estudiante(id_psi, ventana):
+                try:
+                    dato=SubMenu.subAlumnos(ventana, id_psi)
+                    estud.set(dato[0])
+                except:
+                    pass
+
+            def fecha(ventana):
+                try:
+                    dato=SubMenu.subCalendario(ventana)
+                    calendar.set(dato)
+                except:
+                    pass
+
+            def insertar(name_stu, date, num_citas):
+                entrada, act=funciones.Citas.agregarCita(sesion[0], name_stu, date, num_citas)
+                if entrada and act:
+                    self.menuCitas(ventana, sesion)
+
+            #Cuadros de texto
+            frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
+            frame_cuadro.pack(pady=10)
+
+            #Nombre del estudiante
+            lbl_estud=tk.Label(frame_cuadro, text="Nombre del estudiante: ", justify="left")
+            lbl_estud.grid(row=0, column=0, pady=5)
+
+            txt_estud=tk.Entry(frame_cuadro, textvariable=estud)
+            txt_estud.grid(row=1, column=0, pady=[0,15])
+
+            path = os.path.abspath("img/")
+            self.button_image_3 = PhotoImage(file=path + "/sumar.png")
+            button_3 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_3,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:estudiante(sesion[0], ventana),
+                relief="flat",
+                bg=self.color4
+            )
+            button_3.grid(row=1, column=1, padx=2)
+
+            #Calendario
+            lbl_modelo=tk.Label(frame_cuadro, text="Fecha: ", justify="left")
+            lbl_modelo.grid(row=2, column=0, pady=5)
+
+            txt_modelo=tk.Entry(frame_cuadro, textvariable=calendar)
+            txt_modelo.grid(row=3, column=0, pady=[0,15])
+
+            path = os.path.abspath("img/")
+            self.button_image_4 = PhotoImage(file=path + "/sumar.png")
+            button_4 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_4,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:fecha(ventana),
+                relief="flat",
+                bg=self.color4
+            )
+            button_4.grid(row=3, column=1, padx=2)
+
+            #Botones
+            frame_botones=tk.Frame(ventana, width=1500, height=300, bg=self.color2)
+            frame_botones.pack(pady=20)
+            
+            btn_anadir=tk.Button(
+                frame_botones,
+                text="Insertar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:insertar(estud.get(), calendar.get(), 0),
+            )
+            btn_anadir.grid(row=0, column=0, padx=20)
+
+            btn_modify=tk.Button(
+                frame_botones,
+                text="Modificar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:None,
+            )
+            btn_modify.grid(row=0, column=1, padx=20)
+
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuCitas(ventana, sesion),
+            )
+            btn_salir.grid(row=0, column=2, padx=20)
+        elif ori==2:
+            tl=self.grupoTitulo(ventana, sesion, "Insertar estudiantes", False, 0)
+
+            #variables
+            nombre=tk.StringVar()
+            grupo=tk.StringVar()
+            matricula=tk.StringVar()
+            correo=tk.StringVar()
+            telef=tk.StringVar()
+            
+            #funciones
+            def grupos(ventana, id_psi):
+                try:
+                    dato=SubMenu.subGrupos(ventana, id_psi)
+                    grupo.set(dato[0])
+                except:
+                    pass
+
+            def insertar(matricula, id_grp, nombre, corr, tel):
+                entrada=funciones.Estudiantes.agregarEstudiante(matricula, id_grp, nombre, corr, tel)
+                if entrada:
+                    self.menuEstudiantes(ventana, sesion)
+
+            #Cuadros de texto
+            frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
+            frame_cuadro.pack(pady=10)
+
+            #Nombre del estudiante
+            lbl_estud=tk.Label(frame_cuadro, text="Nombre del estudiante: ", justify="left")
+            lbl_estud.grid(row=0, column=0, pady=5)
+
+            txt_estud=tk.Entry(frame_cuadro, textvariable=nombre)
+            txt_estud.grid(row=1, column=0, pady=[0,15])
+
+            #Grupo
+            lbl_grupo=tk.Label(frame_cuadro, text="Grupo: ", justify="left")
+            lbl_grupo.grid(row=2, column=0, pady=5)
+
+            txt_grupo=tk.Entry(frame_cuadro, textvariable=grupo)
+            txt_grupo.grid(row=3, column=0, pady=[0,15])
+
+            path = os.path.abspath("img/")
+            self.button_image_3 = PhotoImage(file=path + "/sumar.png")
+            button_3 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_3,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:grupos(ventana, sesion[0]),
+                relief="flat",
+                bg=self.color4
+            )
+            button_3.grid(row=3, column=1, padx=2)
+
+            #matricula
+            lbl_matri=tk.Label(frame_cuadro, text="Matricula: ", justify="left")
+            lbl_matri.grid(row=4, column=0, pady=5)
+
+            txt_matri=tk.Entry(frame_cuadro, textvariable=matricula, validate="key", validatecommand=verificacion_entero)
+            txt_matri.grid(row=5, column=0, pady=[0,15])
+
+            #correo
+            lbl_correo=tk.Label(frame_cuadro, text="Correo electrónico: ", justify="left")
+            lbl_correo.grid(row=6, column=0, pady=5)
+
+            txt_correo=tk.Entry(frame_cuadro, textvariable=correo, validate="key", validatecommand=verificacion_mail)
+            txt_correo.grid(row=7, column=0, pady=[0,15])
+
+            #telefono
+            lbl_correo=tk.Label(frame_cuadro, text="Teléfono: ", justify="left")
+            lbl_correo.grid(row=8, column=0, pady=5)
+
+            txt_correo=tk.Entry(frame_cuadro, textvariable=telef, validate="key", validatecommand=verificacion_entero)
+            txt_correo.grid(row=9, column=0, pady=[0,15])
+
+            #Botones
+            frame_botones=tk.Frame(ventana, width=1500, height=300, bg=self.color2)
+            frame_botones.pack(pady=20)
+            
+            btn_anadir=tk.Button(
+                frame_botones,
+                text="Insertar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:insertar(matricula.get(), grupo.get(), nombre.get(), correo.get(), telef.get()),
+            )
+            btn_anadir.grid(row=0, column=0, padx=20)
+
+            btn_modify=tk.Button(
+                frame_botones,
+                text="Modificar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:None,
+            )
+            btn_modify.grid(row=0, column=1, padx=20)
+
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuEstudiantes(ventana, sesion),
+            )
+            btn_salir.grid(row=0, column=2, padx=20)
+        elif ori==3:
+            tl=self.grupoTitulo(ventana, sesion, "Insertar tutores", False, 0)
+
+            #variables
+            nombre=tk.StringVar()
+            grupo=tk.StringVar()
+            correo=tk.StringVar()
+            telef=tk.StringVar()
+            
+            #funciones
+            def grupos(ventana, id_psi):
+                try:
+                    dato=SubMenu.subGrupos(ventana, id_psi)
+                    grupo.set(dato[0])
+                except:
+                    pass
+
+            def insertar(id_grp, nombre, corr, tel):
+                entrada=funciones.Tutor.agregarTutor(id_grp, nombre, corr, tel)
+                if entrada:
+                    self.menuTutores(ventana, sesion)
+
+            #Cuadros de texto
+            frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
+            frame_cuadro.pack(pady=10)
+
+            #Nombre del estudiante
+            lbl_estud=tk.Label(frame_cuadro, text="Nombre del estudiante: ", justify="left")
+            lbl_estud.grid(row=0, column=0, pady=5)
+
+            txt_estud=tk.Entry(frame_cuadro, textvariable=nombre)
+            txt_estud.grid(row=1, column=0, pady=[0,15])
+
+            #Grupo
+            lbl_grupo=tk.Label(frame_cuadro, text="Grupo: ", justify="left")
+            lbl_grupo.grid(row=2, column=0, pady=5)
+
+            txt_grupo=tk.Entry(frame_cuadro, textvariable=grupo)
+            txt_grupo.grid(row=3, column=0, pady=[0,15])
+
+            path = os.path.abspath("img/")
+            self.button_image_3 = PhotoImage(file=path + "/sumar.png")
+            button_3 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_3,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:grupos(ventana, sesion[0]),
+                relief="flat",
+                bg=self.color4
+            )
+            button_3.grid(row=3, column=1, padx=2)
+
+            #correo
+            lbl_correo=tk.Label(frame_cuadro, text="Correo electrónico: ", justify="left")
+            lbl_correo.grid(row=4, column=0, pady=5)
+
+            txt_correo=tk.Entry(frame_cuadro, textvariable=correo, validate="key", validatecommand=verificacion_mail)
+            txt_correo.grid(row=5, column=0, pady=[0,15])
+
+            #telefono
+            lbl_correo=tk.Label(frame_cuadro, text="Teléfono: ", justify="left")
+            lbl_correo.grid(row=6, column=0, pady=5)
+
+            txt_correo=tk.Entry(frame_cuadro, textvariable=telef, validate="key", validatecommand=verificacion_entero)
+            txt_correo.grid(row=7, column=0, pady=[0,15])
+
+            #Botones
+            frame_botones=tk.Frame(ventana, width=1500, height=300, bg=self.color2)
+            frame_botones.pack(pady=20)
+            
+            btn_anadir=tk.Button(
+                frame_botones,
+                text="Insertar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:insertar(grupo.get(), nombre.get(), correo.get(), telef.get()),
+            )
+            btn_anadir.grid(row=0, column=0, padx=20)
+
+            btn_modify=tk.Button(
+                frame_botones,
+                text="Modificar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:None,
+            )
+            btn_modify.grid(row=0, column=1, padx=20)
+
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuTutores(ventana, sesion),
+            )
+
 
 class SubMenu(Menu):
     @staticmethod
@@ -802,7 +1154,7 @@ class SubMenu(Menu):
     @staticmethod
     def subAlumnos(ventana, id_psi):
         submenu = tk.Toplevel(ventana, width=400, height=300, bg="#ffffff")
-        submenu.title("Citas")
+        submenu.title("Alumnos")
 
         buscador = tk.StringVar()
 
@@ -881,7 +1233,7 @@ class SubMenu(Menu):
     @staticmethod
     def subTutores(ventana, id_psi):
         submenu = tk.Toplevel(ventana, width=400, height=300, bg="#ffffff")
-        submenu.title("Citas")
+        submenu.title("Tutores")
 
         buscador = tk.StringVar()
 
@@ -958,13 +1310,81 @@ class SubMenu(Menu):
         return submenu.resultado
 
     @staticmethod
+    def subGrupos(ventana, id_psi):
+        submenu = tk.Toplevel(ventana, width=400, height=300, bg="#ffffff")
+        submenu.title("Grupos")
+
+        buscador = tk.StringVar()
+
+        frame_busqueda = tk.Frame(submenu, bg="#ffffff")
+        frame_busqueda.pack(pady=5)
+
+        txt_buscador = tk.Entry(frame_busqueda, textvariable=buscador, width=40)
+        txt_buscador.grid(row=0, column=0, padx=2)
+
+        path = os.path.abspath("img/")
+        button_image_3 = PhotoImage(file=path + "/search.png")
+        # botón de búsqueda (solo uno)
+        button_3 = tk.Button(
+            frame_busqueda,
+            image=button_image_3,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: buscar(buscador.get()),
+            relief="flat",
+            bg="#ffffff"
+        )
+        button_3.image = button_image_3
+        button_3.grid(row=0, column=1, padx=2)
+
+        lista = tk.Listbox(submenu, width=80, height=25, selectmode="single")
+        lista.pack(pady=5)
+
+        grupos = []  # lista que se actualizará
+
+        def buscar(var):
+            nonlocal grupos
+            grupos = funciones.Grupo.buscarGrupo(var)
+            lista.delete(0, tk.END)
+            if grupos:
+                for grup in grupos:
+                    opc = f"{grup[2]} {grup[3]} {grup[4]} {grup[1]}"
+                    lista.insert(tk.END, opc)
+
+            return grupos
+
+        # búsqueda inicial
+        buscar("")
+
+
+        frame_botones = tk.Frame(submenu, bg="#ffffff")
+        frame_botones.pack(pady=20)
+
+        def Aceptar():
+            try:
+                indice = lista.curselection()[0]
+                submenu.resultado = grupos[indice]
+            except:
+                submenu.resultado = None
+            submenu.destroy()
+
+        boton1=tk.Button(frame_botones, text="Seleccionar", command=Aceptar).grid(row=0, column=0, padx=20)
+        boton2=tk.Button(frame_botones, text="Cancelar", command=lambda: submenu.destroy()).grid(row=0, column=1, padx=20)
+
+        submenu.resultado = None
+        submenu.wait_window()
+
+        return submenu.resultado
+
+
+    @staticmethod
     def subCalendario(ventana):
         submenu = tk.Toplevel(ventana)
-        submenu.title("Seleccionar fecha")
+        submenu.title("Calendario")
         submenu.config(bg="#ffffff")
 
         # Fecha actual
-        hoy = datetime.date.today()
+        hoy = datetime.today().date()
 
         # Crear calendario
         cal = Calendar(

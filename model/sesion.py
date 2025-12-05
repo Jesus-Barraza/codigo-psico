@@ -88,6 +88,18 @@ class Citas():
                 return citas
         except:
             return []
+    
+    @staticmethod
+    def InsertarCita(id_stu, psicologo_id, date, num_citas):
+        try:
+            cursor.execute(
+                "INSERT INTO appointments VALUES (null, %s, %s, %s, 'Activo', %s, null, null)",
+                (id_stu, psicologo_id, date, num_citas)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
 
 class Students():
     @staticmethod
@@ -108,6 +120,30 @@ class Students():
                 return citas
         except:
             return []
+        
+    @staticmethod
+    def InsertarEstudiante(mat, grp, nom, mail, phone):
+        try:
+            cursor.execute(
+                "INSERT INTO Students VALUES (%s, %s, %s, %s, %s, 0, 0)",
+                (mat, grp, nom, mail, phone)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+        
+    @staticmethod
+    def actaulizarCitas(num_citas, id_stu):
+        try:
+            cursor.execute(
+                "update students set cont_app=%s where control_num=%s",
+                (num_citas, id_stu)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
 
 class Tutores():
     @staticmethod
@@ -123,6 +159,38 @@ class Tutores():
             else:
                 cursor.execute(
                     "SELECT name_tea, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_tea, phone_tea FROM `tutored` JOIN groups on FK_group=groups.ID_group"
+                )
+                citas=cursor.fetchall()
+                return citas
+        except:
+            return []
+
+    @staticmethod
+    def InsertarTutor(grp, nom, mail, phone):
+        try:
+            cursor.execute(
+                "INSERT INTO tutored VALUES (null, %s, %s, %s, %s)",
+                (grp, nom, mail, phone)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
+class Grupos():
+    @staticmethod
+    def buscarGrupos(var):
+        try:
+            if len(var) > 0:
+                cursor.execute(
+                    "SELECT * FROM `groups` where carrer like %s",
+                    (var, )
+                )
+                citas=cursor.fetchall()
+                return citas
+            else:
+                cursor.execute(
+                    "SELECT * FROM `groups`"
                 )
                 citas=cursor.fetchall()
                 return citas

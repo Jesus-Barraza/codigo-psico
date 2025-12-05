@@ -82,6 +82,13 @@ class Usuarios():
 
 class Citas():
     @staticmethod
+    def respuestaSql(res):
+        if res:
+            res=messagebox.showinfo(title="Resultado de la operación", message="Operación realizada con éxito")
+        else:
+            res=messagebox.showerror(title="Resultado de la operación", message="Hubo un fallo al realizar la operación, inténtelo más tarde")
+
+    @staticmethod
     def obtener_citas_dia(psicologo_id):
         citas=sesion.Citas.obtener_citas_dia(psicologo_id)
         return citas
@@ -95,15 +102,43 @@ class Citas():
     def buscarCitas(psicologo_id, var):
         citas=sesion.Citas.buscarCitas(psicologo_id, var)
         return citas
+
+    @staticmethod
+    def agregarCita(psicologo_id, name_stu, date, num_citas):
+        citas=sesion.Students.buscarEstudiante(name_stu)
+        id_stu=citas[0][1]
+        num_citas=int(citas[0][5])+1
+        res=sesion.Citas.InsertarCita(id_stu, psicologo_id,  date, num_citas)
+        res2=sesion.Students.actaulizarCitas(num_citas, id_stu)
+        Citas.respuestaSql(res)
+        return res, res2
     
 class Estudiantes():
     @staticmethod
     def buscarEstudiantes(var):
         citas=sesion.Students.buscarEstudiante(var)
         return citas
+    
+    @staticmethod
+    def agregarEstudiante(matricula, grupo, nombre, correo, telefono):
+        res=sesion.Students.InsertarEstudiante(matricula, grupo, nombre, correo, telefono)
+        Citas.respuestaSql(res)
+        return res
 
 class Tutor():
     @staticmethod
     def buscarTutores(var):
         citas=sesion.Tutores.buscarTutores(var)
+        return citas
+
+    @staticmethod
+    def agregarTutor(grupo, nombre, correo, telefono):
+        res=sesion.Tutores.InsertarTutor(grupo, nombre, correo, telefono)
+        Citas.respuestaSql(res)
+        return res
+
+class Grupo():
+    @staticmethod
+    def buscarGrupo(var):
+        citas=sesion.Grupos.buscarGrupos(var)
         return citas
