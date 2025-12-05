@@ -101,20 +101,32 @@ class Citas():
         except:
             return False
 
+    @staticmethod
+    def ActualizarCita(id_stu, date, psicologo_id, cita_id):
+        try:
+            cursor.execute(
+                "update appointments set FK_stu=%s, date=%s, status= 'Alterado' where FK_psy=%s and ID_app=%s",
+                (id_stu, date, psicologo_id, cita_id)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
 class Students():
     @staticmethod
     def buscarEstudiante(var):
         try:
             if len(var):
                 cursor.execute(
-                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp FROM `students` JOIN groups on FK_group=groups.ID_group where name_stu like %s",
+                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp FROM, groups.ID_group `students` JOIN groups on FK_group=groups.ID_group where name_stu like %s",
                     (f"%{var}%", )
                 )
                 citas=cursor.fetchall()
                 return citas
             else:
                 cursor.execute(
-                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp FROM `students` JOIN groups on FK_group=groups.ID_group"
+                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group"
                 )
                 citas=cursor.fetchall()
                 return citas
@@ -134,11 +146,23 @@ class Students():
             return False
         
     @staticmethod
-    def actaulizarCitas(num_citas, id_stu):
+    def actualizarCitas(num_citas, id_stu):
         try:
             cursor.execute(
                 "update students set cont_app=%s where control_num=%s",
                 (num_citas, id_stu)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def ActualizarEstudiante(matricula, grupo, nombre, correo, telefono):
+        try:
+            cursor.execute(
+                "update students set FK_group=%s, name_stu=%s, mail_stu=%s, phone_stu=%s where control_num=%s",
+                (grupo, nombre, correo, telefono, matricula)
             )
             conexion.commit()
             return True
@@ -151,14 +175,14 @@ class Tutores():
         try:
             if len(var):
                 cursor.execute(
-                    "SELECT name_tea, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_tea, phone_tea FROM `tutored` JOIN groups on FK_group=groups.ID_group where name_tea like %s",
+                    "SELECT name_tea, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_tea, phone_tea, groups.ID_group, ID_tutor FROM `tutored` JOIN groups on FK_group=groups.ID_group where name_tea like %s",
                     (f"%{var}%", )
                 )
                 citas=cursor.fetchall()
                 return citas
             else:
                 cursor.execute(
-                    "SELECT name_tea, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_tea, phone_tea FROM `tutored` JOIN groups on FK_group=groups.ID_group"
+                    "SELECT name_tea, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_tea, phone_tea, groups.ID_group, ID_tutor FROM `tutored` JOIN groups on FK_group=groups.ID_group"
                 )
                 citas=cursor.fetchall()
                 return citas
@@ -171,6 +195,18 @@ class Tutores():
             cursor.execute(
                 "INSERT INTO tutored VALUES (null, %s, %s, %s, %s)",
                 (grp, nom, mail, phone)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def ActualizarTutor(grupo, correo, telefono, ID_tutor):
+        try:
+            cursor.execute(
+                "update tutored set FK_group=%s, mail_tea=%s, phone_tea=%s where ID_tutor=%s",
+                (grupo, correo, telefono, ID_tutor)
             )
             conexion.commit()
             return True

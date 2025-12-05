@@ -112,6 +112,14 @@ class Citas():
         res2=sesion.Students.actaulizarCitas(num_citas, id_stu)
         Citas.respuestaSql(res)
         return res, res2
+
+    @staticmethod
+    def modificarCita(name_stu, date, id_psi, id_date):
+        citas=sesion.Students.buscarEstudiante(name_stu)
+        id_stu=citas[0][1]
+        res=sesion.Citas.ActualizarCita(id_stu, date, id_psi, id_date)
+        Citas.respuestaSql(res)
+        return res
     
 class Estudiantes():
     @staticmethod
@@ -124,6 +132,13 @@ class Estudiantes():
         res=sesion.Students.InsertarEstudiante(matricula, grupo, nombre, correo, telefono)
         Citas.respuestaSql(res)
         return res
+    
+    @staticmethod
+    def actualizarEstudiante(matricula, grupo, nombre, correo, telefono):
+        res=sesion.Students.ActualizarEstudiante(matricula, grupo, nombre, correo, telefono)
+        Citas.respuestaSql(res)
+        return res
+        
 
 class Tutor():
     @staticmethod
@@ -134,6 +149,14 @@ class Tutor():
     @staticmethod
     def agregarTutor(grupo, nombre, correo, telefono):
         res=sesion.Tutores.InsertarTutor(grupo, nombre, correo, telefono)
+        Citas.respuestaSql(res)
+        return res
+
+    @staticmethod
+    def actualizarTutor(nombre, grupo, correo, telefono):
+        datos=sesion.Tutores.buscarTutores(nombre)
+        ID_tutor=datos[0][5]
+        res=sesion.Tutores.ActualizarTutor( grupo, correo, telefono, ID_tutor)
         Citas.respuestaSql(res)
         return res
 
