@@ -113,6 +113,18 @@ class Citas():
         except:
             return False
 
+    @staticmethod
+    def EliminarCita(cita_id, psicologo_id):
+        try:
+            cursor.execute(
+                "delete from appointments where ID_app=%s and FK_psy=%s",
+                (cita_id, psicologo_id)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
 class Students():
     @staticmethod
     def buscarEstudiante(var):

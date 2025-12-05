@@ -487,7 +487,7 @@ class Menu():
             fg="red",
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.eliminar(ventana, sesion),
         )
         btn_eliminar.grid(row=0, column=2, padx=20)
 
@@ -606,7 +606,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.beta(ventana, sesion),
         )
         btn_citar.grid(row=0, column=1, padx=20)
 
@@ -617,7 +617,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.beta(ventana, sesion),
         )
         btn_consult.grid(row=0, column=2, padx=20)
 
@@ -719,7 +719,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda:None,
+            command=lambda:self.beta(ventana, sesion),
         )
         btn_consult.grid(row=0, column=1, padx=20)
 
@@ -1078,7 +1078,7 @@ class Menu():
         verificacion_mail=(ventana.register(self.limit_mail), "%P")
 
         if ori==1:
-            tl=self.grupoTitulo(ventana, sesion, "Insertar citas", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Actualizar citas", False, 0)
 
             #variables
             cit=tk.StringVar()
@@ -1328,7 +1328,7 @@ class Menu():
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ori==3:
-            tl=self.grupoTitulo(ventana, sesion, "Insertar tutores", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Actualizar tutores", False, 0)
 
             #variables
             ide=tk.StringVar()
@@ -1437,6 +1437,85 @@ class Menu():
                 command=lambda:self.menuTutores(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
+
+    def eliminar(self, ventana, sesion):
+        self.borrarPantalla(ventana)
+        tl=self.grupoTitulo(ventana, sesion, "Eliminar citas", False, 0)
+
+        #variables
+        cit=tk.StringVar()
+        
+        #funciones
+        def cita(id_psi, ventana):
+            try:
+                datos=SubMenu.subCitas(ventana, id_psi)
+                cit.set(datos[0])
+            except:
+                pass
+
+        def eliminar(citar, id_psicologo):
+            entrada=funciones.Citas.eliminarCita(citar, id_psicologo)
+            if entrada:
+                self.menuCitas(ventana, sesion)
+
+        #Cuadros de texto
+        frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
+        frame_cuadro.pack(pady=10)
+
+        #Cita a modificar
+        lbl_cit=tk.Label(frame_cuadro, text="Cita a modificar: ", justify="left")
+        lbl_cit.grid(row=0, column=0, pady=5)
+
+        txt_cit=tk.Entry(frame_cuadro, textvariable=cit)
+        txt_cit.grid(row=1, column=0, pady=[0,15])
+
+        path = os.path.abspath("img/")
+        self.button_image_5 = PhotoImage(file=path + "/sumar.png")
+        button_5 = tk.Button(
+            frame_cuadro,
+            image=self.button_image_5,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda:cita(sesion[0], ventana),
+            relief="flat",
+            bg=self.color4
+        )
+        button_5.grid(row=1, column=1, padx=2)
+
+        #Botones
+        frame_botones=tk.Frame(ventana, width=1500, height=300, bg=self.color2)
+        frame_botones.pack(pady=20)
+        
+        btn_quitar=tk.Button(
+            frame_botones,
+            text="Eliminar",
+            font=("Arial", 20, "underline"),
+            fg="red",
+            bg=self.color2,
+            cursor="hand2",
+            command=lambda:eliminar(cit.get(), sesion[0]),
+        )
+        btn_quitar.grid(row=0, column=0, padx=20)
+
+        btn_salir=tk.Button(
+            frame_botones,
+            text="Regresar",
+            font=("Arial", 20, "underline"),
+            fg=self.color3,
+            bg=self.color2,
+            cursor="hand2",
+            command=lambda:self.menuCitas(ventana, sesion),
+        )
+        btn_salir.grid(row=0, column=1, padx=20)
+
+    def beta(self, ventana, sesion):
+        self.borrarPantalla(ventana)
+        self.submenu(ventana, sesion)
+        tl=self.grupoTitulo(ventana, sesion, "Aviso del beta", False, 0)
+        
+        lbl_beta=tk.Label(ventana, text="Esta función no se encuentra disponible por lo pronto")
+        lbl_beta.pack(pady=30)
+
 
 class SubMenu(Menu):
     @staticmethod
