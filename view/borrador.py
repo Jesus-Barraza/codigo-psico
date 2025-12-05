@@ -87,6 +87,7 @@ class Menu():
         # Según el número de pantalla, recargar vista
         self.menuConfiguraciones(ventana, sesion)
 
+
     def grupoTitulo(self, ventana, sesion, texto, config, num):
         if num!=0 and num!=6:
             self.num=num
@@ -1820,6 +1821,7 @@ class SubMenu(Menu):
         submenu.wait_window()
 
         return submenu.resultado
+
 
     @staticmethod
     def subCalendario(ventana):
