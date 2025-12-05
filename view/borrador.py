@@ -256,7 +256,7 @@ class Menu():
                 borderwidth=0,
                 highlightthickness=0,
                 cursor="hand2",
-                command=lambda:None
+                command=lambda:self.insertar(ventana, sesion, 1)
             )
             btn_interaccion.pack(pady=10)
 
