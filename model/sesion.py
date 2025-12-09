@@ -131,22 +131,44 @@ class Students():
         try:
             if len(var):
                 cursor.execute(
-                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp FROM, groups.ID_group `students` JOIN groups on FK_group=groups.ID_group where name_stu like %s",
+                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group where name_stu like %s ORDER BY name_stu DESC",
                     (f"%{var}%", )
                 )
                 citas=cursor.fetchall()
                 return citas
             else:
                 cursor.execute(
-                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group"
+                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group ORDER BY name_stu DESC"
                 )
                 citas=cursor.fetchall()
                 return citas
         except:
             return []
+    
+    @staticmethod
+    def comprobarEstudiante(var):
+        try:
+            cursor.execute(
+                "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group WHERE control_num like %s",
+                (f"%{var}%", )
+            )
+            citas=cursor.fetchall()
+            if len(citas)!=1:
+                cursor.execute(
+                    "SELECT name_stu, control_num, CONCAT(groups.period, ' ', groups.group_code, ' ', groups.modal, ' ', groups.carrer), mail_stu, phone_stu, cont_app, susp, groups.ID_group FROM `students` JOIN groups on FK_group=groups.ID_group WHERE name_stu like %s",
+                    (f"%{var}%", )
+                )
+                citas=cursor.fetchall()
+                return citas
+                if len(citas)!=1:
+                    return []
+            else:
+                return citas
+        except:
+            return []
         
     @staticmethod
-    def InsertarEstudiante(mat, grp, nom, mail, phone):
+    def insertarEstudiante(mat, grp, nom, mail, phone):
         try:
             cursor.execute(
                 "INSERT INTO Students VALUES (%s, %s, %s, %s, %s, 0, 0)",
@@ -162,7 +184,7 @@ class Students():
         try:
             cursor.execute(
                 "update students set cont_app=%s where control_num=%s",
-                (num_citas, id_stu)
+                (num_citas+1, id_stu)
             )
             conexion.commit()
             return True
@@ -170,7 +192,7 @@ class Students():
             return False
 
     @staticmethod
-    def ActualizarEstudiante(matricula, grupo, nombre, correo, telefono):
+    def actualizarEstudiante(matricula, grupo, nombre, correo, telefono):
         try:
             cursor.execute(
                 "update students set FK_group=%s, name_stu=%s, mail_stu=%s, phone_stu=%s where control_num=%s",
