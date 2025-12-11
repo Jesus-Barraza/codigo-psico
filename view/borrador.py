@@ -1145,6 +1145,7 @@ class Menu():
             tl=self.grupoTitulo(ventana, sesion, "Actualizar citas", False, 0)
 
             #variables
+            var=[]
             cit=tk.StringVar()
             matri=tk.StringVar()
             estud=tk.StringVar()
@@ -1551,7 +1552,7 @@ class Menu():
 
         def eliminar(ide, id_psicologo):
             if ver==1:
-                entrada=funciones.Citas.eliminarCita(citar, id_psicologo)
+                entrada=funciones.Citas.eliminarCita(ide, id_psicologo)
                 if entrada:
                     self.menuCitas(ventana, sesion)
             elif ver==2:
