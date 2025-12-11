@@ -203,6 +203,18 @@ class Students():
         except:
             return False
 
+    @staticmethod
+    def eliminarEstudiante(matricula):
+        try:
+            cursor.execute(
+                "delete from students where control_num=%s",
+                (matricula, )
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+
 class Tutores():
     @staticmethod
     def buscarTutores(var):
@@ -241,6 +253,18 @@ class Tutores():
             cursor.execute(
                 "update tutored set FK_group=%s, mail_tea=%s, phone_tea=%s where ID_tutor=%s",
                 (grupo, correo, telefono, ID_tutor)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
+    
+    @staticmethod
+    def eliminarTutor(ide):
+        try:
+            cursor.execute(
+                "delete from tutored where ID_tutor=%s",
+                (ide, )
             )
             conexion.commit()
             return True
