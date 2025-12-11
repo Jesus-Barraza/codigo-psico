@@ -104,20 +104,25 @@ class Citas():
         return citas
 
     @staticmethod
-    def agregarCita(psicologo_id, name_stu, date, num_citas):
-        citas=sesion.Students.buscarEstudiante(name_stu)
-        id_stu=citas[0][1]
-        num_citas=int(citas[0][5])+1
-        res=sesion.Citas.InsertarCita(id_stu, psicologo_id,  date, num_citas)
-        res2=sesion.Students.actaulizarCitas(num_citas, id_stu)
-        Citas.respuestaSql(res)
-        return res, res2
+    def agregarCita(psicologo_id, name_stu, date, matricul, full):
+        res=sesion.Citas.InsertarCita(matricul, psicologo_id, date, full[0][5])
+        res2=sesion.Students.actualizarCitas(full[0][5], matricul)
+        if res and res2:
+            res_t=True
+        else:
+            res_t=False
+        Citas.respuestaSql(res_t)
+        return res
 
     @staticmethod
-    def modificarCita(name_stu, date, id_psi, id_date):
+    def modificarCita(name_stu, matr, date, id_psi, id_date):
         citas=sesion.Students.buscarEstudiante(name_stu)
-        id_stu=citas[0][1]
-        res=sesion.Citas.ActualizarCita(id_stu, date, id_psi, id_date)
+        if len(citas):
+            matr=citas[0][1]
+        else:
+            citas=sesion.Students.comprobarEstudiante(matr)
+            matr=citas[0][1]
+        res=sesion.Citas.ActualizarCita(matr, date, id_psi, id_date)
         Citas.respuestaSql(res)
         return res
 
@@ -133,21 +138,36 @@ class Citas():
     
 class Estudiantes():
     @staticmethod
+    def comprobarEstudiantes(var):
+        estudiante=sesion.Students.comprobarEstudiante(var)
+        return estudiante
+
+    @staticmethod
     def buscarEstudiantes(var):
         citas=sesion.Students.buscarEstudiante(var)
         return citas
     
     @staticmethod
     def agregarEstudiante(matricula, grupo, nombre, correo, telefono):
-        res=sesion.Students.InsertarEstudiante(matricula, grupo, nombre, correo, telefono)
+        res=sesion.Students.insertarEstudiante(matricula, grupo, nombre, correo, telefono)
         Citas.respuestaSql(res)
         return res
     
     @staticmethod
     def actualizarEstudiante(matricula, grupo, nombre, correo, telefono):
-        res=sesion.Students.ActualizarEstudiante(matricula, grupo, nombre, correo, telefono)
+        res=sesion.Students.actualizarEstudiante(matricula, grupo, nombre, correo, telefono)
         Citas.respuestaSql(res)
         return res
+
+    @staticmethod
+    def eliminarEstudiantes(matricula):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Seguro que desea borrar el registro de este alumno?", icon="warning")
+        if noti:
+            res=sesion.Students.eliminarEstudiante(matricula)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
         
 
 class Tutor():
@@ -169,6 +189,16 @@ class Tutor():
         res=sesion.Tutores.ActualizarTutor( grupo, correo, telefono, ID_tutor)
         Citas.respuestaSql(res)
         return res
+
+    @staticmethod
+    def eliminarTutores(ide):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Seguro que desea borrar el registro de este tutor?", icon="warning")
+        if noti:
+            res=sesion.Tutores.eliminarTutor(ide)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
 
 class Grupo():
     @staticmethod
