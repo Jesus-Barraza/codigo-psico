@@ -158,6 +158,16 @@ class Estudiantes():
         res=sesion.Students.actualizarEstudiante(matricula, grupo, nombre, correo, telefono)
         Citas.respuestaSql(res)
         return res
+
+    @staticmethod
+    def eliminarEstudiantes(matricula):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Seguro que desea borrar el registro de este alumno?", icon="warning")
+        if noti:
+            res=sesion.Students.eliminarEstudiante(matricula)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
         
 
 class Tutor():
@@ -179,6 +189,16 @@ class Tutor():
         res=sesion.Tutores.ActualizarTutor( grupo, correo, telefono, ID_tutor)
         Citas.respuestaSql(res)
         return res
+
+    @staticmethod
+    def eliminarTutores(ide):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Seguro que desea borrar el registro de este tutor?", icon="warning")
+        if noti:
+            res=sesion.Tutores.eliminarTutor(ide)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
 
 class Grupo():
     @staticmethod

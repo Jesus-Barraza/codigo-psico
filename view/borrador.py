@@ -491,9 +491,20 @@ class Menu():
             fg="red",
             bg=self.color2,
             cursor="hand2",
-            command=lambda:self.eliminar(ventana, sesion),
+            command=lambda:self.eliminar(ventana, sesion, 1),
         )
         btn_eliminar.grid(row=0, column=2, padx=20)
+
+        btn_exportar=tk.Button(
+            frame_botones,
+            text="Exportar",
+            font=("Arial", 20, "underline"),
+            fg=self.color3,
+            bg=self.color2,
+            cursor="hand2",
+            command=lambda:self.beta(ventana, sesion),
+        )
+        btn_exportar.grid(row=0, column=3, padx=20)
 
     def menuEstudiantes(self, ventana, sesion):
         self.borrarPantalla(ventana)
@@ -614,17 +625,6 @@ class Menu():
         )
         btn_modificar.grid(row=0, column=1, padx=20)
 
-        btn_citar=tk.Button(
-            frame_botones,
-            text="Citar",
-            font=("Arial", 20, "underline"),
-            fg=self.color3,
-            bg=self.color2,
-            cursor="hand2",
-            command=lambda:self.beta(ventana, sesion),
-        )
-        btn_citar.grid(row=0, column=2, padx=20)
-
         btn_consult=tk.Button(
             frame_botones,
             text="Consultar",
@@ -635,6 +635,17 @@ class Menu():
             command=lambda:self.beta(ventana, sesion),
         )
         btn_consult.grid(row=0, column=3, padx=20)
+
+        btn_eliminar=tk.Button(
+            frame_botones,
+            text="Eliminar",
+            font=("Arial", 20, "underline"),
+            fg="red",
+            bg=self.color2,
+            cursor="hand2",
+            command=lambda:self.eliminar(ventana, sesion, 2),
+        )
+        btn_eliminar.grid(row=0, column=4, padx=20)
 
     def menuTutores(self, ventana, sesion):
         self.borrarPantalla(ventana)
@@ -749,6 +760,17 @@ class Menu():
         )
         btn_consult.grid(row=0, column=2, padx=20)
 
+        btn_eliminar=tk.Button(
+            frame_botones,
+            text="Eliminar",
+            font=("Arial", 20, "underline"),
+            fg="red",
+            bg=self.color2,
+            cursor="hand2",
+            command=lambda:self.eliminar(ventana, sesion, 3),
+        )
+        btn_eliminar.grid(row=0, column=3, padx=20)
+
     def acercaDe(self, ventana, sesion):
         self.borrarPantalla(ventana)
 
@@ -765,7 +787,7 @@ class Menu():
         label.image = self.img_logo
         label.pack(pady=30)
 
-        lbl_upd=tk.Label(ventana, text="V0.3")
+        lbl_upd=tk.Label(ventana, text="V0.5")
         lbl_upd.pack(pady=15)
 
     def beta(self, ventana, sesion):
@@ -1283,14 +1305,14 @@ class Menu():
                     correo.set(datos[3])
                     telef.set(datos[4])
                 except:
-                    pass
+                    self.cancelar()
 
             def grupos(ventana, id_psi):
                 try:
                     dato=submenu.SubMenu.subGrupos(ventana, id_psi)
                     grupo.set(dato[0])
                 except:
-                    pass
+                    self.cancelar()
 
             def actualizar(matricula, id_grp, nombre, corr, tel):
                 entrada=funciones.Estudiantes.actualizarEstudiante(matricula, id_grp, nombre, corr, tel)
@@ -1406,14 +1428,14 @@ class Menu():
                     correo.set(datos[2])
                     telef.set(datos[3])
                 except:
-                    pass
+                    self.cancelar()
 
             def grupos(ventana, id_psi):
                 try:
                     dato=submenu.SubMenu.subGrupos(ventana, id_psi)
                     grupo.set(dato[0])
                 except:
-                    pass
+                    self.cancelar()
 
             def insertar(id_grp, nombre, corr, tel):
                 entrada=funciones.Tutor.actualizarTutor(nombre, id_grp, corr, tel)
@@ -1498,72 +1520,172 @@ class Menu():
             )
             btn_salir.grid(row=0, column=1, padx=20)
 
-    def eliminar(self, ventana, sesion):
+    def eliminar(self, ventana, sesion, ver):
         self.borrarPantalla(ventana)
-        tl=self.grupoTitulo(ventana, sesion, "Eliminar citas", False, 0)
+        tl=self.grupoTitulo(ventana, sesion, "Eliminar", False, 0)
 
         #variables
-        cit=tk.StringVar()
+        ide=tk.StringVar()
         
         #funciones
         def cita(id_psi, ventana):
             try:
                 datos=submenu.SubMenu.subCitas(ventana, id_psi)
-                cit.set(datos[0])
+                ide.set(datos[0])
             except:
-                pass
+                self.cancelar()
 
-        def eliminar(citar, id_psicologo):
-            entrada=funciones.Citas.eliminarCita(citar, id_psicologo)
-            if entrada:
-                self.menuCitas(ventana, sesion)
+        def estudiantes(id_psi, ventana):
+            try:
+                datos=submenu.SubMenu.subAlumnos(ventana, id_psi)
+                ide.set(datos[1])
+            except:
+                self.cancelar()
+
+        def tutores(id_psi, ventana):
+            try:
+                datos=submenu.SubMenu.subTutores(ventana, id_psi)
+                ide.set(datos[5])
+            except:
+                self.cancelar()
+
+        def eliminar(ide, id_psicologo):
+            if ver==1:
+                entrada=funciones.Citas.eliminarCita(citar, id_psicologo)
+                if entrada:
+                    self.menuCitas(ventana, sesion)
+            elif ver==2:
+                entrada=funciones.Estudiantes.eliminarEstudiantes(ide)
+                if entrada:
+                    self.menuEstudiantes(ventana, sesion)
+            elif ver==3:
+                entrada=funciones.Tutor.eliminarTutores(ide)
+                if entrada:
+                    self.menuTutores(ventana, sesion)
 
         #Cuadros de texto
         frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
         frame_cuadro.pack(pady=10)
 
-        #Cita a modificar
-        lbl_cit=tk.Label(frame_cuadro, text="Cita a modificar: ", justify="left", bg=self.color2)
+        #Cosa a eliminar
+        if ver==1:
+            txt="Cita a eliminar"
+        elif ver==2:
+            txt="Alumno a eliminar"
+        elif ver==3:
+            txt="Tutor a eliminar"
+        lbl_cit=tk.Label(frame_cuadro, text=txt, justify="left", bg=self.color2)
         lbl_cit.grid(row=0, column=0, pady=5)
 
-        txt_cit=tk.Entry(frame_cuadro, textvariable=cit)
+        txt_cit=tk.Entry(frame_cuadro, textvariable=ide)
         txt_cit.grid(row=1, column=0, pady=[0,15])
 
-        path = os.path.abspath("img/")
-        self.button_image_5 = PhotoImage(file=path + "/sumar.png")
-        button_5 = tk.Button(
-            frame_cuadro,
-            image=self.button_image_5,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda:cita(sesion[0], ventana),
-            relief="flat",
-            bg=self.color4
-        )
-        button_5.grid(row=1, column=1, padx=2)
+        if ver==1:
+            path = os.path.abspath("img/")
+            self.button_image_5 = PhotoImage(file=path + "/sumar.png")
+            button_5 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_5,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:cita(sesion[0], ventana),
+                relief="flat",
+                bg=self.color4
+            )
+            button_5.grid(row=1, column=1, padx=2)
+        elif ver==2:
+            path = os.path.abspath("img/")
+            self.button_image_5 = PhotoImage(file=path + "/sumar.png")
+            button_5 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_5,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:estudiantes(sesion[0], ventana),
+                relief="flat",
+                bg=self.color4
+            )
+            button_5.grid(row=1, column=1, padx=2)
+        elif ver==3:
+            path = os.path.abspath("img/")
+            self.button_image_5 = PhotoImage(file=path + "/sumar.png")
+            button_5 = tk.Button(
+                frame_cuadro,
+                image=self.button_image_5,
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda:tutores(sesion[0], ventana),
+                relief="flat",
+                bg=self.color4
+            )
+            button_5.grid(row=1, column=1, padx=2)
 
         #Botones
         frame_botones=tk.Frame(ventana, width=1500, height=300, bg=self.color2)
         frame_botones.pack(pady=20)
-        
-        btn_quitar=tk.Button(
-            frame_botones,
-            text="Eliminar",
-            font=("Arial", 20, "underline"),
-            fg="red",
-            bg=self.color2,
-            cursor="hand2",
-            command=lambda:eliminar(cit.get(), sesion[0]),
-        )
-        btn_quitar.grid(row=0, column=0, padx=20)
+        if ver==1:
+            btn_quitar=tk.Button(
+                frame_botones,
+                text="Eliminar",
+                font=("Arial", 20, "underline"),
+                fg="red",
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:eliminar(ide.get(), sesion[0]),
+            )
+            btn_quitar.grid(row=0, column=0, padx=20)
 
-        btn_salir=tk.Button(
-            frame_botones,
-            text="Regresar",
-            font=("Arial", 20, "underline"),
-            fg=self.color3,
-            bg=self.color2,
-            cursor="hand2",
-            command=lambda:self.menuCitas(ventana, sesion),
-        )
-        btn_salir.grid(row=0, column=1, padx=20)
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuCitas(ventana, sesion),
+            )
+            btn_salir.grid(row=0, column=1, padx=20)
+        elif ver==2:
+            btn_quitar=tk.Button(
+                frame_botones,
+                text="Eliminar",
+                font=("Arial", 20, "underline"),
+                fg="red",
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:eliminar(ide.get(), sesion[0]),
+            )
+            btn_quitar.grid(row=0, column=0, padx=20)
+
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuEstudiantes(ventana, sesion),
+            )
+            btn_salir.grid(row=0, column=1, padx=20)
+        elif ver==3:
+            btn_quitar=tk.Button(
+                frame_botones,
+                text="Eliminar",
+                font=("Arial", 20, "underline"),
+                fg="red",
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:eliminar(ide.get(), sesion[0]),
+            )
+            btn_quitar.grid(row=0, column=0, padx=20)
+
+            btn_salir=tk.Button(
+                frame_botones,
+                text="Regresar",
+                font=("Arial", 20, "underline"),
+                fg=self.color3,
+                bg=self.color2,
+                cursor="hand2",
+                command=lambda:self.menuTutores(ventana, sesion),
+            )
+            btn_salir.grid(row=0, column=1, padx=20)

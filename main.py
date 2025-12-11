@@ -14,3 +14,4 @@ class app():
 if __name__ == "__main__":
     if start:
         ft.app(target=app, assets_dir="img", view=ft.AppView.FLET_APP)
+        
