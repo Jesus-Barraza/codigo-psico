@@ -319,8 +319,18 @@ class SubMenu():
 
         # Fecha actual
         hoy = datetime.today().date()
+        ahora=datetime.today().time()
+
+        # Variables
+        hora=tk.StringVar()
+        horas=["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
+               "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
+        hora.set(f"{ahora.hour:02d}:00")
 
         # Crear calendario
+        lbl_calendario=tk.Label(submenu, text="Selecciona la fecha de la cita en el calendario")
+        lbl_calendario.pack(pady=0)
+
         cal = Calendar(
             submenu,
             selectmode="day",
@@ -329,7 +339,14 @@ class SubMenu():
             day=hoy.day,
             date_pattern="yyyy-mm-dd"
         )
-        cal.pack(pady=20)
+        cal.pack(pady=[10,20])
+
+        # Crear selector de horas
+        lbl_horario=tk.Label(submenu, text="Selecciona la hora de la cita en esta lista")
+        lbl_horario.pack(pady=0)
+        
+        time = tk.OptionMenu(submenu, hora, *horas)
+        time.pack(pady=[10,20])
 
         # Frame de botones
         frame_botones = tk.Frame(submenu, bg="#ffffff")
@@ -337,7 +354,7 @@ class SubMenu():
 
         # Botón aceptar
         def Aceptar():
-            submenu.resultado = cal.get_date()   # ← aquí guardas la fecha seleccionada
+            submenu.resultado = cal.get_date() + " " + hora.get()
             submenu.destroy()
 
         tk.Button(
