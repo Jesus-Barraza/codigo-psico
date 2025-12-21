@@ -89,6 +89,10 @@ class Citas():
             res=messagebox.showerror(title="Resultado de la operación", message="Hubo un fallo al realizar la operación, inténtelo más tarde")
 
     @staticmethod
+    def cancelar():
+        noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
+
+    @staticmethod
     def obtener_citas_dia(psicologo_id):
         citas=sesion.Citas.obtener_citas_dia(psicologo_id)
         return citas
@@ -134,7 +138,17 @@ class Citas():
             Citas.respuestaSql(res)
             return res
         else:
-            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
+            Citas.cancelar
+
+    @staticmethod
+    def cancelarCitas(id_date, id_psi):
+        noti=messagebox.askyesno(title="¡Cuidado!", message="¿Deseas cancelar la cita?", icon="warning")
+        if noti:
+            res=sesion.Citas.cancelarCita(id_date, id_psi)
+            Citas.respuestaSql(res)
+            return res
+        else:
+            Citas.cancelar
     
 class Estudiantes():
     @staticmethod
@@ -167,7 +181,7 @@ class Estudiantes():
             Citas.respuestaSql(res)
             return res
         else:
-            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
+            Citas.cancelar
         
 
 class Tutor():
@@ -198,7 +212,7 @@ class Tutor():
             Citas.respuestaSql(res)
             return res
         else:
-            noti=messagebox.showinfo(title="Operación", message="Se ha cancelado la operación con éxito")
+            Citas.cancelar
 
 class Grupo():
     @staticmethod

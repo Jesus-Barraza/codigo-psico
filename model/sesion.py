@@ -124,6 +124,18 @@ class Citas():
             return True
         except:
             return False
+        
+    @staticmethod
+    def cancelarCita(cita_id, psicologo_id):
+        try:
+            cursor.execute(
+                "update appointments set status = 'Cancelado' where FK_psy=%s and ID_app=%s",
+                (psicologo_id, cita_id)
+            )
+            conexion.commit()
+            return True
+        except:
+            return False
 
 class Students():
     @staticmethod
