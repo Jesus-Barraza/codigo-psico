@@ -17,17 +17,19 @@ def iniciarFlet():
     ft.app(target=Volver, assets_dir="img", view=ft.AppView.FLET_APP)
 
 class Menu():
-    def __init__(self, ventana, sesion):
+    def __init__(self, ventana, sesion, tema):
         self.color1 = "#5E95D4"
         self.color2 = "#E2E2E2"
         self.color3 = "#000000"
         self.color4 = "#ffffff"
         self.color5 = "#B7B22F"
-        self.tema_oscuro=False
+        self.tema_oscuro=tema
         self.hoy=datetime.now()
         ventana.geometry("1920x1080")
         ventana.title("Programa de psicopedagogía")   
-        ventana.config(bg=self.color2)  
+        ventana.config(bg=self.color2)
+        self.cambiarTema(ventana, sesion, self.tema_oscuro, False)
+        self.num=1
         self.menuPrincipal(ventana, sesion)
 
     @staticmethod
@@ -35,11 +37,14 @@ class Menu():
         for widget in ventana.winfo_children():
             widget.destroy()
 
-    def cambiarTema(self, ventana, sesion, oscuro_var):
-        self.tema_oscuro = oscuro_var.get()  # <-- Actualiza valor persistente
-        self.modoOscuro(ventana, sesion, self.tema_oscuro)
+    def cambiarTema(self, ventana, sesion, oscuro_var, config):
+        try:
+            self.tema_oscuro = oscuro_var.get()
+        except AttributeError:
+            self.tema_oscuro= oscuro_var
+        self.modoOscuro(ventana, sesion, self.tema_oscuro, config)
     
-    def modoOscuro(self, ventana, sesion, status):
+    def modoOscuro(self, ventana, sesion, status, config):
         # Cambiar colores globales
         if not status:
             # Tema claro
@@ -57,13 +62,10 @@ class Menu():
             self.color4 = "#323232"
             self.color5 = "#836819"
             ventana.config(bg=self.color2)
-
-        # Limpia todo
-        self.borrarPantalla(ventana)
-
-        # Según el número de pantalla, recargar vista
-        self.menuConfiguraciones(ventana, sesion)
-
+        
+        if config:
+            self.borrarPantalla(ventana)
+            self.menuConfiguraciones(ventana, sesion)
 
     def grupoTitulo(self, ventana, sesion, texto, config, num):
         if num!=0 and num!=6:
@@ -137,17 +139,17 @@ class Menu():
             )
             button_1.grid(row=0, column=0, padx=10)
 
-            def retorno(num):
-                if num==1:
-                    button_1.config(command=lambda:self.menuPrincipal(ventana, sesion))
-                elif num==2:
-                    button_1.config(command=lambda:self.menuCalendario(ventana, sesion))
-                elif num==3:
-                    button_1.config(command=lambda:self.menuCitas(ventana, sesion))
-                elif num==4:
-                    button_1.config(command=lambda:self.menuEstudiantes(ventana, sesion))
-                elif num==5:
-                    button_1.config(command=lambda:self.menuTutores(ventana, sesion))
+        def retorno(num):
+            if num==1:
+                button_1.config(command=lambda:self.menuPrincipal(ventana, sesion))
+            elif num==2:
+                button_1.config(command=lambda:self.menuCalendario(ventana, sesion))
+            elif num==3:
+                button_1.config(command=lambda:self.menuCitas(ventana, sesion))
+            elif num==4:
+                button_1.config(command=lambda:self.menuEstudiantes(ventana, sesion))
+            elif num==5:
+                button_1.config(command=lambda:self.menuTutores(ventana, sesion))
 
     def submenu(self,ventana, sesion):
         #funcion
@@ -231,7 +233,7 @@ class Menu():
                     highlightthickness=0,
                     command=functools.partial(funciones.Citas.cancelarCitas, cita[0], sesion[0]),
                     relief="flat",
-                    bg=self.color1
+                    bg=self.color4
                 )
                 button_3.image = img
                 button_3.grid(row=num_citas, column=4, padx=10, pady=5)
@@ -251,7 +253,7 @@ class Menu():
                 borderwidth=0,
                 highlightthickness=0,
                 cursor="hand2",
-                command=lambda: funcionalidad.Funcionalidad(ventana, sesion).insertar(ventana, sesion, 1)
+                command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 1).insertar(ventana, sesion, 1)
             )
             btn_interaccion.pack(pady=10)
 
@@ -355,7 +357,7 @@ class Menu():
             highlightthickness=0,
             cursor="hand2",
             variable=oscuro,
-            command=lambda:self.cambiarTema(ventana, sesion, oscuro)
+            command=lambda:self.cambiarTema(ventana, sesion, oscuro, True)
         )
         switch_modo.pack(pady=20)
         
@@ -452,7 +454,7 @@ class Menu():
                         highlightthickness=0,
                         command=functools.partial(funciones.Citas.cancelarCitas, cita[0], sesion[0]),
                         relief="flat",
-                        bg=self.color1
+                        bg=self.color4
                     )
                     button_3.image = img
                     button_3.grid(row=num_citas, column=4, padx=10, pady=5)
@@ -477,7 +479,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).insertar(ventana, sesion, 1),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 2).insertar(ventana, sesion, 1),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
 
@@ -488,7 +490,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).actualizar(ventana, sesion, 1),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 2).actualizar(ventana, sesion, 1),
         )
         btn_modificar.grid(row=0, column=1, padx=20)
 
@@ -499,7 +501,7 @@ class Menu():
             fg="red",
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).eliminar(ventana, sesion, 1),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 2).eliminar(ventana, sesion, 1),
         )
         btn_eliminar.grid(row=0, column=2, padx=20)
 
@@ -618,7 +620,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).insertar(ventana, sesion, 2),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 3).insertar(ventana, sesion, 2),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
         
@@ -629,7 +631,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).actualizar(ventana, sesion, 2),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 3).actualizar(ventana, sesion, 2),
         )
         btn_modificar.grid(row=0, column=1, padx=20)
 
@@ -651,7 +653,7 @@ class Menu():
             fg="red",
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).eliminar(ventana, sesion, 2),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 3).eliminar(ventana, sesion, 2),
         )
         btn_eliminar.grid(row=0, column=4, padx=20)
 
@@ -742,7 +744,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).insertar(ventana, sesion, 3),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 4).insertar(ventana, sesion, 3),
         )
         btn_anadir.grid(row=0, column=0, padx=20)
 
@@ -753,7 +755,7 @@ class Menu():
             fg=self.color3,
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).actualizar(ventana, sesion, 3),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 4).actualizar(ventana, sesion, 3),
         )
         btn_modificar.grid(row=0, column=1, padx=20)
 
@@ -775,7 +777,7 @@ class Menu():
             fg="red",
             bg=self.color2,
             cursor="hand2",
-            command=lambda: funcionalidad.Funcionalidad(ventana, sesion).eliminar(ventana, sesion, 3),
+            command=lambda: funcionalidad.Funcionalidad(ventana, self.tema_oscuro, 4).eliminar(ventana, sesion, 3),
         )
         btn_eliminar.grid(row=0, column=3, padx=20)
 

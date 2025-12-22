@@ -307,7 +307,7 @@ class Menu():
                     start.start()
                     ventana.window.destroy()
                     window=tk.Tk()
-                    borrador.Menu(window, sesion)
+                    borrador.Menu(window, sesion, False)
                     window.mainloop()
                 else:
                     lbl_error.value="Correo o contraseña incorrectos."

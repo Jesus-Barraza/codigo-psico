@@ -9,14 +9,23 @@ import multiprocessing
 from datetime import datetime
 
 class Funcionalidad():
-    def __init__(self, ventana, sesion):
-        self.color1 = "#5E95D4"
-        self.color2 = "#E2E2E2"
-        self.color3 = "#000000"
-        self.color4 = "#ffffff"
-        self.color5 = "#B7B22F"
-        self.tema_oscuro=False
+    def __init__(self, ventana, status, num):
+        if not status:
+            self.color1 = "#5E95D4"
+            self.color2 = "#E2E2E2"
+            self.color3 = "#000000"
+            self.color4 = "#ffffff"
+            self.color5 = "#B7B22F"
+        else:
+            self.color1 = "#353e70"
+            self.color2 = "#353535"
+            self.color3 = "#d6d6d6"
+            self.color4 = "#323232"
+            self.color5 = "#836819"
+        self.tema_oscuro=status
         self.hoy=datetime.now()
+        self.num=num
+        ventana.config(bg=self.color2)
 
     @staticmethod
     def cancelar():
@@ -49,40 +58,21 @@ class Funcionalidad():
             return True
         else:
             return False
-
-    def modoOscuro(self, ventana, sesion, status):
-        # Cambiar colores globales
-        if not status:
-            # Tema claro
-            self.color1 = "#5E95D4"
-            self.color2 = "#D9D9D9"
-            self.color3 = "#000000"
-            self.color4 = "#ffffff"
-            self.color5 = "#B7B22F"
-            ventana.config(bg=self.color2)
-        else:
-            # Tema oscuro
-            self.color1 = "#353e70"
-            self.color2 = "#353535"
-            self.color3 = "#d6d6d6"
-            self.color4 = "#323232"
-            self.color5 = "#836819"
-            ventana.config(bg=self.color2)
-
-        # Limpia todo
-        self.borrarPantalla(ventana)
-
-        # Según el número de pantalla, recargar vista
-        self.menuConfiguraciones(ventana, sesion)
     
-    def grupoTitulo(self, ventana, sesion, texto, config, num):
-        if num!=0 and num!=6:
-            self.num=num
+    def grupoTitulo(self, ventana, sesion, texto):
+        #funcion
+        def retorno(num):
+            if num==1:
+                button_1.config(command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuPrincipal(ventana, sesion))
+            elif num==2:
+                button_1.config(command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion))
+            elif num==3:
+                button_1.config(command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion))
+            elif num==4:
+                button_1.config(command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion))
+
         # Frame superior
-        if num==6:
-            frame_superior = tk.Frame(ventana, bg=self.color5, height=200, highlightbackground=self.color3, highlightthickness=3)
-        else:
-            frame_superior = tk.Frame(ventana, bg=self.color1, height=200, highlightbackground=self.color5, highlightthickness=3)
+        frame_superior = tk.Frame(ventana, bg=self.color1, height=200, highlightbackground=self.color5, highlightthickness=3)
         frame_superior.pack(fill="x", side="top")
 
         # Frame contenedor horizontal
@@ -94,7 +84,7 @@ class Funcionalidad():
         frame_horizontal.columnconfigure(2, weight=1)
 
         # Frame del título (izquierda)
-        if num==4 or num==5:
+        if self.num==4 or self.num==3:
             frame_titulo = tk.Frame(frame_horizontal, bg=self.color5, height=30, width=600)
             lbl_titulo = tk.Label(frame_titulo, text=texto, font=("Arial", 24), fg=self.color3, bg=self.color5)
         else:
@@ -103,61 +93,19 @@ class Funcionalidad():
         frame_titulo.grid(row=0, column=1, padx=10)
         lbl_titulo.pack(anchor="center")
 
-        if config:
-            # Frame de botones (derecha)
-            frame_botones = tk.Frame(frame_horizontal, bg=self.color1)
-            frame_botones.grid(row=0, column=2, sticky="e")
-
-            path = os.path.abspath("img/")
-            self.button_image_1 = PhotoImage(file=path + "/config.png")
-            button_1 = tk.Button(
-                frame_botones,
-                image=self.button_image_1,
-                borderwidth=0,
-                highlightthickness=0,
-                command=lambda:self.menuConfiguraciones(ventana, sesion),
-                relief="flat",
-                bg=self.color1
-            )
-            button_1.pack(side="left", padx=10)
-
-            self.button_image_2 = PhotoImage(file=path + "/noti.png")
-            button_2 = tk.Button(
-                frame_botones,
-                image=self.button_image_2,
-                borderwidth=0,
-                highlightthickness=0,
-                command=lambda: self.menuNotificaciones(ventana, sesion),
-                relief="flat",
-                bg=self.color1
-            )
-            button_2.pack(side="left", padx=10)
-        else:
-            #Frame de retorno
-            path = os.path.abspath("img/")
-            self.button_image_1 = PhotoImage(file=path + "/Atras.png")
-            button_1 = tk.Button(
-                frame_horizontal,
-                image=self.button_image_1,
-                borderwidth=0,
-                highlightthickness=0,
-                command=lambda:retorno(self.num),
-                relief="flat",
-                bg=self.color1
-            )
-            button_1.grid(row=0, column=0, padx=10)
-
-            def retorno(num):
-                if num==1:
-                    button_1.config(command=lambda:borrador.Menu(ventana, sesion).menuPrincipal(ventana, sesion))
-                elif num==2:
-                    button_1.config(command=lambda:borrador.Menu(ventana, sesion).menuCalendario(ventana, sesion))
-                elif num==3:
-                    button_1.config(command=lambda:borrador.Menu(ventana, sesion).menuCitas(ventana, sesion))
-                elif num==4:
-                    button_1.config(command=lambda:borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion))
-                elif num==5:
-                    button_1.config(command=lambda:borrador.Menu(ventana, sesion).menuTutores(ventana, sesion))
+        #Frame de retorno
+        path = os.path.abspath("img/")
+        self.button_image_1 = PhotoImage(file=path + "/Atras.png")
+        button_1 = tk.Button(
+            frame_horizontal,
+            image=self.button_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda:retorno(self.num),
+            relief="flat",
+            bg=self.color1
+        )
+        button_1.grid(row=0, column=0, padx=10)
 
     def insertar(self, ventana, sesion, ori):
         self.borrarPantalla(ventana)
@@ -167,7 +115,7 @@ class Funcionalidad():
         verificacion_mail=(ventana.register(self.limit_mail), "%P")
 
         if ori==1:
-            tl=self.grupoTitulo(ventana, sesion, "Insertar citas", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Insertar citas", )
 
             #variables
             full_estud=[]
@@ -216,7 +164,7 @@ class Funcionalidad():
                 if confirm:
                     entrada=funciones.Citas.agregarCita(sesion[0], name_stu, date, matricul, full)
                     if entrada:
-                        borrador.Menu(ventana, sesion).menuCitas(ventana, sesion)
+                        borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion)
                     else:
                         lbl_aviso.config(text="Hubo un error a la hora de agregar la cita, inténtelo más tarde")
                 
@@ -300,11 +248,11 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuCitas(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ori==2:
-            tl=self.grupoTitulo(ventana, sesion, "Insertar estudiantes", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Insertar estudiantes")
 
             #variables
             nombre=tk.StringVar()
@@ -324,7 +272,7 @@ class Funcionalidad():
             def insertar(matricula, id_grp, nombre, corr, tel):
                 entrada=funciones.Estudiantes.agregarEstudiante(matricula, id_grp, nombre, corr, tel)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion)
 
             #Cuadros de texto
             frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -400,11 +348,11 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ori==3:
-            tl=self.grupoTitulo(ventana, sesion, "Insertar tutores", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Insertar tutores")
 
             #variables
             nombre=tk.StringVar()
@@ -423,7 +371,7 @@ class Funcionalidad():
             def insertar(id_grp, nombre, corr, tel):
                 entrada=funciones.Tutor.agregarTutor(id_grp, nombre, corr, tel)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuTutores(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion)
 
             #Cuadros de texto
             frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -492,7 +440,7 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuTutores(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion),
             )
             btn_salir.grid(row=0, column=2, padx=20)
         
@@ -503,7 +451,7 @@ class Funcionalidad():
         verificacion_mail=(ventana.register(self.limit_mail), "%P")
 
         if ori==1:
-            tl=self.grupoTitulo(ventana, sesion, "Actualizar citas", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Actualizar citas")
 
             #variables
             var=[]
@@ -543,7 +491,7 @@ class Funcionalidad():
             def actualizar(name_stu, matricul, date, id_psicologo, citar):
                 entrada=funciones.Citas.modificarCita(name_stu, matricul, date, id_psicologo, citar)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuCitas(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion)
 
             #Cuadros de texto
             frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -644,11 +592,11 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuCitas(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ori==2:
-            tl=self.grupoTitulo(ventana, sesion, "Actualizar estudiantes", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Actualizar estudiantes")
 
             #variables
             nombre=tk.StringVar()
@@ -679,7 +627,7 @@ class Funcionalidad():
             def actualizar(matricula, id_grp, nombre, corr, tel):
                 entrada=funciones.Estudiantes.actualizarEstudiante(matricula, id_grp, nombre, corr, tel)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion)
 
             #Cuadros de texto
             frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -768,11 +716,11 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ori==3:
-            tl=self.grupoTitulo(ventana, sesion, "Actualizar tutores", False, 0)
+            tl=self.grupoTitulo(ventana, sesion, "Actualizar tutores")
 
             #variables
             ide=tk.StringVar()
@@ -802,7 +750,7 @@ class Funcionalidad():
             def insertar(id_grp, nombre, corr, tel):
                 entrada=funciones.Tutor.actualizarTutor(nombre, id_grp, corr, tel)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuTutores(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion)
 
             #Cuadros de texto
             frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -878,13 +826,13 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuTutores(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
 
     def eliminar(self, ventana, sesion, ver):
         self.borrarPantalla(ventana)
-        tl=self.grupoTitulo(ventana, sesion, "Eliminar", False, 0)
+        tl=self.grupoTitulo(ventana, sesion, "Eliminar")
 
         #variables
         ide=tk.StringVar()
@@ -915,15 +863,15 @@ class Funcionalidad():
             if ver==1:
                 entrada=funciones.Citas.eliminarCita(ide, id_psicologo)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuCitas(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion)
             elif ver==2:
                 entrada=funciones.Estudiantes.eliminarEstudiantes(ide)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion)
             elif ver==3:
                 entrada=funciones.Tutor.eliminarTutores(ide)
                 if entrada:
-                    borrador.Menu(ventana, sesion).menuTutores(ventana, sesion)
+                    borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion)
 
         #Cuadros de texto
         frame_cuadro=tk.Frame(ventana, width=1000, height=700, bg=self.color2)
@@ -1004,7 +952,7 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuCitas(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuCitas(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ver==2:
@@ -1026,7 +974,7 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuEstudiantes(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuEstudiantes(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
         elif ver==3:
@@ -1048,6 +996,6 @@ class Funcionalidad():
                 fg=self.color3,
                 bg=self.color2,
                 cursor="hand2",
-                command=lambda:borrador.Menu(ventana, sesion).menuTutores(ventana, sesion),
+                command=lambda:borrador.Menu(ventana, sesion, self.tema_oscuro).menuTutores(ventana, sesion),
             )
             btn_salir.grid(row=0, column=1, padx=20)
